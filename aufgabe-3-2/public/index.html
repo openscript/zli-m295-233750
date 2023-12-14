@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+      const API = "http://localhost:45407";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("temperatureForm");
+        const display = document.getElementById("temperatureDisplay");
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const temperatureEndPoint = `${API}/${formData.get("zip")}`;
+
+          const response = await fetch(temperatureEndPoint);
+          const temperature = await response.text();
+
+          display.innerText = temperature;
+        })
+      })
+    </script>
+  </head>
+
+  <body>
+    <form id="temperatureForm">
+      <input type="text" name="zip" />
+      <button type="submit">Abfragen</button>
+    </form>
+    <div id="temperatureDisplay">
+      -
+    </div>
+  </body>
+
+</html>

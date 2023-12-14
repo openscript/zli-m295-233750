@@ -1,5 +1,5 @@
 const request = require('request');
-let url ="https://jsonplaceholder.typicode.com/posts/1/comments";
+let url ="https://app-prod-ws.meteoswiss-app.ch/v1/plzDetail?plz=818000";
 
 request.get({
   url: url,
@@ -12,6 +12,6 @@ request.get({
     console.log('Status:', res.statusCode);
   } else {
     // data is already parsed as JSON:
-    console.log(data);
+    console.log(data.currentWeather.temperature);
   }
 });
