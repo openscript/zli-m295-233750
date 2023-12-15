@@ -2,8 +2,11 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+// Hier lade ich die Express JSON Middleware, damit ich an meine Endpunkte JSON-Daten im Body senden kann und diese direkt als JavaScript Objekt verfügbar werden.
+app.use(express.json());
+
 // generated with ChatGPT
-const books = [
+let books = [
   { isbn: "978-0143124177", title: "The Goldfinch", year: "2013", author: "Donna Tartt" },
   { isbn: "978-0307277671", title: "The Road", year: "2006", author: "Cormac McCarthy" },
   { isbn: "978-0553386790", title: "The Book Thief", year: "2005", author: "Markus Zusak" },
@@ -21,7 +24,42 @@ app.get('/books', (request, response) => {
 });
 
 app.get('/books/:isbn', (request, response) => {
-  response.send(books.find((book) => /* ... */ ))
+  response.send(books.find((book) => book.isbn === request.params.isbn ))
+});
+
+app.post('/books', (request, response) => {
+  // immutable manipulation
+  books = [...books, request.body];
+  // mutable manipulation
+  books.push(request.body);
+  response.status(201).send(books);
+});
+
+app.put('/books/:isbn', (request, response) => {
+  books = books.map((book) => book.isbn === request.params.isbn ? request.body : book);
+  /*
+  books = books.map((book) => {
+    if(book.isbn === request.params.isbn) {
+      return request.body;
+    } else {
+      return book;
+    }
+  });
+  */
+  response.send(books);
+});
+
+app.patch('/books/:isbn', (request, response) => {
+  const keys = Object.keys(request.body);
+  const oldBook = books.find((book) => book.isbn === request.params.isbn );
+  keys.forEach((key) => oldBook[key] = request.body[key]);
+  books = books.map((book) => book.isbn === request.params.isbn ? oldBook : book);
+  response.send(books);
+});
+
+app.delete('/books/:isbn', (request, response) => {
+  books = books.filter((book) => book.isbn !== request.params.isbn);
+  response.send(books);
 });
 
 app.listen(port, () => {
