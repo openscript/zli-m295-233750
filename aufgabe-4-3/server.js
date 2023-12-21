@@ -1,3 +1,4 @@
+const { randomUUID } = require('node:crypto');
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -76,7 +77,20 @@ app.get('/lends/:id', (request, response) => {
 
 app.post('/lends', (request, response) => {
   const newLend = request.body;
+  newLend['id'] = randomUUID();
   newLend['borrowed_at'] = new Date().toISOString();
+  newLend['returned_at'] = null;
+
+  if(!newLend['isbn'] || !newLend['customer_id']) {
+    return response.status(422).send("isbn and customer_id are required!");
+  }
+
+  const lendsByCustomer = lends.filter((lend) => lend['customer_id'] === newLend['customer_id'] && !lend['returned_at']);
+
+  if(lendsByCustomer.length >= 3) {
+    return response.status(400).send("Customer has too many active lends.")
+  }
+
   lends = [...lends, request.body];
   response.status(201).send(lends);
 });
